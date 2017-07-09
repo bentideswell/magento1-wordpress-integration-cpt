@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Fishpig_Wordpress_Addon_CPT>
+			<active>true</active>
+			<codePool>community</codePool>
+			<depends>
+				<Fishpig_Wordpress />
+			</depends>
+		</Fishpig_Wordpress_Addon_CPT>
+	</modules>
+</config>

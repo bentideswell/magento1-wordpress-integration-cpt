@@ -1,0 +1,73 @@
+##
+# Custom Post Types / WordPress Integration
+#
+# Author:			    	 FishPig Limited (Ben Tideswell)
+# URL:	 					 fishpig.co.uk/custom-post-types-in-wordpress-integration.html
+##
+
+23/11/2015 - v2.1.1.1
+- Integrated Search now listens to exclude_from_search post type option. If this option is set to True, the post type will not be included in the integrated search results. For more information about Integrated Search, please see http://fishpig.co.uk/magento/wordpress-integration/integrated-search/
+
+11/09/2015 - v2.1.0.0
+- Added licensing system to extension and some general bug fixes.
+
+13/08/2015 - v2.0.0.8
+- Moved some functionality (auto plugin installation) from the extension to Magento WordPress Integration so that other add-on extensions can use it.
+
+16/06/2015 - v2.0.0.6
+- Updated embedded WP plugin
+
+13/06/2015 - v2.0.0.5
+- Fixed RSS feed for custom post type archive pages
+
+11/06/2015 - v2.0.0.4
+- Added improvements to post types that have hierarchies
+
+11/06/2015 - v2.0.0.3
+- Minor bug fixes
+
+09/06/2015 - v2.0.0.0
+- Added better support for post types and taxonomies.
+- Removed configuration option. Post Types and Taxonomies are automatically generated in WordPress and saved in the DB
+- Magento reads this automatically
+
+25/02/2015 - v1.3.0.0
+- Updated to integrate with Integrated Search so you can now search custom post types
+
+28/10/2014 - v1.2.7.2
+- Added ability to include '/' character in rewrite slug for custom post types
+
+29/05/2014 - v1.2.7.0
+- Added custom post types to associations system
+
+23/04/2014 - v1.2.6.1
+- Fix for custom templates
+
+14/04/2014 - v1.2.5.0
+- Fix for displaying posts with a custom type on terms
+
+12/04/2014 - v1.2.4.0
+- Small updates to slug
+
+07/10/2013 - v1.2.3.1
+- Removed posts from default post lists (homepage, categories, archives, tags etc)
+
+27/09/2013 - v1.2.3.0
+- If post list template is empty, posts will not be displayed in the usual post lists (homepage, categories, archives etc) and only in their own archive
+
+23/07/2013 - v1.2.2.0
+- Fixed issue when using custom slug
+
+16/07/2013 - v1.2.0.1
+- Improved system.xml comments
+- Fixed issue that stopped custom templates from working.
+
+10/07/2013 - v1.2.0.0
+- Migrated post types to WordPress Magento configuration
+- Added support for WordPress Integration v3.0
+
+23/05/2013 - v1.0.0.7
+- Added fix for single store Magento installations
+
+23/05/2013 - v1.0.0.6
+- Added delete action to Adminhtml controller

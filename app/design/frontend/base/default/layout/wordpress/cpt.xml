@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<layout>
+	<!--
+	/**
+	 * List posts form a custom type
+	 *
+	 */
+	 -->
+	<wordpress_post_customtype>
+		<reference name="content">
+			<block type="wp_addon_cpt/view" name="wp.post.customtype" template="wordpress-addons/cpt/view.phtml">
+				<block type="wordpress/post_list" name="wordpress_post_list" as="post_list" />
+			</block>
+		</reference>
+	</wordpress_post_customtype>
+</layout>
