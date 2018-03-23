@@ -1,9 +1,9 @@
 ##
 # Custom Post Types / WordPress Integration
-#
-# Author:			    	 FishPig Limited (Ben Tideswell)
-# URL:	 					 fishpig.co.uk/custom-post-types-in-wordpress-integration.html
 ##
+
+10/01/2018 - v2.2.0.0
+- Removed need for custom post type plugin in WordPress.
 
 23/11/2015 - v2.1.1.1
 - Integrated Search now listens to exclude_from_search post type option. If this option is set to True, the post type will not be included in the integrated search results. For more information about Integrated Search, please see http://fishpig.co.uk/magento/wordpress-integration/integrated-search/

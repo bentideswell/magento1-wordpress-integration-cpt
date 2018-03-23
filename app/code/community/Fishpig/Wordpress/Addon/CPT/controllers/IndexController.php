@@ -4,6 +4,7 @@
  * @package     Fishpig_Wordpress
  * @license     http://fishpig.co.uk/license.txt
  * @author      Ben Tideswell <help@fishpig.co.uk>
+ * @SkipObfuscation
  */
 
 class Fishpig_Wordpress_Addon_CPT_IndexController extends Fishpig_Wordpress_Controller_Abstract

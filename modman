@@ -2,4 +2,3 @@ app/code/community/Fishpig/Wordpress/Addon/CPT									app/code/community/Fishpi
 app/design/frontend/base/default/layout/wordpress/cpt.xml				app/design/frontend/base/default/layout/wordpress/cpt.xml
 app/design/frontend/base/default/template/wordpress-addons/cpt	app/design/frontend/base/default/template/wordpress-addons/cpt
 app/etc/modules/Fishpig_Wordpress_Addon_CPT.xml									app/etc/modules/Fishpig_Wordpress_Addon_CPT.xml
-var/connect/Fishpig_Wordpress_Addon_CPT.xml											var/connect/Fishpig_Wordpress_Addon_CPT.xml

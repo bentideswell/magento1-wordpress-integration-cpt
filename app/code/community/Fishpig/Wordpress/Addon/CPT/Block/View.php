@@ -34,7 +34,7 @@ class Fishpig_Wordpress_Addon_CPT_Block_View extends Fishpig_Wordpress_Block_Pos
 			$collection = $this->getPostType()->getPostCollection();
 			
 			if ($this->getParsedSearchTerm()) {
-				$collection->addSearchStringFilter($this->getParsedSearchTerm(), array('post_title', 'post_content'));
+				$collection->addSearchStringFilter($this->getParsedSearchTerm(), array('post_title' => 5, 'post_content' => 1));
 			}
 			
 			return $collection;

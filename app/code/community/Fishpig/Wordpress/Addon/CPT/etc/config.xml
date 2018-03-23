@@ -2,11 +2,11 @@
 <config>
 	<modules>
 		<Fishpig_Wordpress_Addon_CPT>
-			<version>2.1.1.3</version>
+			<version>2.2.0.1</version>
 			<fishpig>
 				<id>posttypes-taxonomies</id>
 				<name>Post Types and Taxonomies</name>
-				<url>http://fishpig.co.uk/magento/wordpress-integration/post-types-taxonomies/</url>
+				<url>https://fishpig.co.uk/magento/wordpress-integration/post-types-taxonomies/</url>
 			</fishpig>
 		</Fishpig_Wordpress_Addon_CPT>
 	</modules>
@@ -83,36 +83,4 @@
 			</updates>
 		</layout>
 	</frontend>
-	<adminhtml>
-		<events>
-			<wordpress_integration_tests_after>
-				<observers>
-					<wp_addon_cpt>
-						<type>singleton</type>
-						<class>wp_addon_cpt/observer</class>
-						<method>applyIntegrationTestsObserver</method>
-					</wp_addon_cpt>
-				</observers>
-			</wordpress_integration_tests_after>
-		</events>
-	</adminhtml>
-	<fishpig>
-		<injection>
-			<Fishpig_Inject_Wordpress_Block_System_Config_Form_Field_License>
-				<Fishpig_Wordpress_Addon_CPT>
-					<Block_System_Config_Form_Field_License><ignore /></Block_System_Config_Form_Field_License>
-				</Fishpig_Wordpress_Addon_CPT>
-			</Fishpig_Inject_Wordpress_Block_System_Config_Form_Field_License>
-			<Fishpig_Inject_Wordpress_Helper_License>
-				<Fishpig_Wordpress_Addon_CPT>
-					<Helper_License><ignore /></Helper_License>
-				</Fishpig_Wordpress_Addon_CPT>
-			</Fishpig_Inject_Wordpress_Helper_License>
-		</injection>
-		<encode>
-			<helper_license>app/code/community/Fishpig/Wordpress/Addon/CPT/Helper/License.php</helper_license>
-			<block_view>app/code/community/Fishpig/Wordpress/Addon/CPT/Block/View.php</block_view>
-			<block_license>app/code/community/Fishpig/Wordpress/Addon/CPT/Block/System/Config/Form/Field/License.php</block_license>
-		</encode>
-	</fishpig>
 </config>

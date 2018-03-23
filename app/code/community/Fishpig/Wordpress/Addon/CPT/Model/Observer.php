@@ -67,42 +67,171 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 	
 	public function initPostTypesObserver(Varien_Event_Observer $observer)
 	{
-		$helper = $observer->getEvent()->getHelper();
-		
-		if ($postTypesEncoded = $helper->getWpOption('fishpig_posttypes')) {
-			$postTypes = json_decode($postTypesEncoded, true);
+		try {
+			$cacheKey = 'posttype_' . Mage::app()->getStore()->getId();
+
+			if ($postTypes = $this->_getCache()->load($cacheKey)) {
+				$postTypes = json_decode($postTypes, true);
+			}
 			
-			if (is_array($postTypes)) {
-				foreach($postTypes as $postType => $postTypeData) {
-					$postTypes[$postType] = Mage::getModel('wordpress/post_type')
-						->setData($postTypeData)
-						->setPostType($postType);
+			if (!$postTypes) {
+				if ($postTypes = $this->_getPostTypeDataFromWordPress()) {
+					$this->_getCache()->save(json_encode($postTypes), $cacheKey);
+				}
+			}
+
+			if (!$postTypes) {
+				throw new Exception('Unable to get post types.');
+			}
+
+			foreach($postTypes as $type => $data) {
+				$postTypes[$type] = Mage::getModel('wordpress/post_type')->setData($data)->setPostType($type);
+			}
+
+			$observer->getEvent()->getTransport()->setPostTypes($postTypes);
+		}
+		catch (Exception $e) {
+			Mage::helper('wordpress')->log($e->getMessage());
+		}
+
+		return $this;
+	}
+	
+	/*
+	 * Get post type data from WordPress
+	 *
+	 * @return array|false
+	 */
+	protected function _getPostTypeDataFromWordPress()
+	{
+		try {
+			return $this->simulatedCallback(function() {
+				if (!defined('ABSPATH')) {
+					return false;
+				}
+	
+				$postTypesToIgnore = array('attachment', 'nav_menu_item', 'revision');
+	
+				// Include plugin.php so we can check whether WPPermastructure is active
+				include_once ABSPATH . 'wp-admin/includes/plugin.php';
+			
+				$wpPermastructureActive = is_plugin_active('wp-permastructure/wp-permastructure.php');
+		
+				if (!($customPostTypes = get_post_types(array('_builtin' => false, 'public' => true), 'objects'))) {
+					return false;
 				}
 				
-				$observer->getEvent()->getTransport()->setPostTypes($postTypes);
+				$postTypeData = array_merge($customPostTypes, get_post_types(array('_builtin' => true), 'objects'));
+	
+				foreach($postTypeData as $type => $data) {
+					if (in_array($type, $postTypesToIgnore)) {
+						unset($postTypeData[$type]);
+						continue;
+					}
+		
+					$data = json_decode(json_encode($data), true);
+		
+					if ($type === 'post') {
+						$data['rewrite'] = array(
+							'slug' => get_option('permalink_structure')
+						);
+						
+						$data['taxonomies'] = array_merge($data['taxonomies'], array('category', 'post_tag'));
+					}
+					else if ($type === 'page') {
+						$data['rewrite'] = array(
+							'slug' => '%postname%/',
+						);				
+					}
+					else if ($wpPermastructureActive && $wpPermastructure = get_option($type . '_permalink_structure')) {
+						$data['rewrite']['slug'] = $wpPermastructure;
+					}
+	
+					// Convert any stdClass instances to an array
+					$postTypeData[$type] = $data;
+				}
+	
+				return $postTypeData;
+			});
+		}
+		catch (Exception $e) {
+			return false;
+		}
+	}
+	
+	public function initTaxonomiesObserver(Varien_Event_Observer $observer)
+	{
+		try {
+			$cacheKey = 'taxonomy_' . Mage::app()->getStore()->getId();
+
+			if ($taxonomies = $this->_getCache()->load($cacheKey)) {
+				$taxonomies = json_decode($taxonomies, true);
 			}
+
+			if (!$taxonomies) {
+				if ($taxonomies = $this->_getTaxonomyDataFromWordPress()) {
+					$this->_getCache()->save(json_encode($taxonomies), $cacheKey);
+				}
+			}
+
+			if (!$taxonomies) {
+				throw new Exception('Unable to get taxonomies.');
+			}
+
+			foreach($taxonomies as $taxonomy => $data) {
+				$taxonomies[$taxonomy] = Mage::getModel('wordpress/term_taxonomy')->setData($data)->setTaxonomyType($taxonomy);
+			}
+
+			$observer->getEvent()->getTransport()->setTaxonomies($taxonomies);
+		}
+		catch (Exception $e) {
+			Mage::helper('wordpress')->log($e->getMessage());
 		}
 		
 		return $this;
 	}
 	
-	public function initTaxonomiesObserver(Varien_Event_Observer $observer)
+	/*
+	 *
+	 *
+	 * @return array|false
+	 */
+	protected function _getTaxonomyDataFromWordPress()
 	{
-		if ($taxonomiesEncoded = Mage::helper('wordpress')->getWpOption('fishpig_taxonomies')) {
-			$taxonomies = json_decode($taxonomiesEncoded, true);
-
-			if (is_array($taxonomies)) {
-				foreach($taxonomies as $taxonomy => $taxonomyData) {
-					$taxonomies[$taxonomy] = Mage::getModel('wordpress/term_taxonomy')
-						->setData($taxonomyData)
-						->setTaxonomyType($taxonomy);
+		try {
+			return $this->simulatedCallback(function() {
+				if (!($customTaxonomies = get_taxonomies(array('_builtin' => false), 'objects'))) {
+					return false;
 				}
-	
-				$observer->getEvent()->getTransport()->setTaxonomies($taxonomies);
-			}
-		}
+				
+				$taxonomiesToIgnore = array('nav_menu', 'link_category', 'post_format');
+				$taxonomyData = array_merge($customTaxonomies, get_taxonomies(array('_builtin' => true), 'objects'));
 		
-		return $this;
+				$blogPrefix = is_multisite() && !is_subdomain_install() && is_main_site();
+		
+				foreach($taxonomyData as $taxonomy => $data) {
+					if (in_array($taxonomy, $taxonomiesToIgnore)) {
+						unset($taxonomyData[$taxonomy]);
+						continue;
+					}
+		
+					$data = json_decode(json_encode($data), true);
+		
+					if ($blogPrefix && isset($data['rewrite']) && isset($data['rewrite']['slug'])) {
+						if (strpos($data['rewrite']['slug'], 'blog/') === 0) {
+							$data['rewrite']['slug'] = substr($data['rewrite']['slug'], strlen('blog/'));
+						}
+					}
+					
+					$taxonomyData[$taxonomy] = $data;
+				}
+		
+				return $taxonomyData;
+			});
+		}
+		catch (Exception $e) {
+			return false;
+		}
 	}
 	
 	/**
@@ -198,76 +327,40 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 	}
 	
 	/**
-	 * Apply the integration tests
+	 * Perform a callback during WordPress simulation mode
 	 *
-	 * @param Varien_Event_Observer $observer
-	 * @return $this
-	 */
-	public function applyIntegrationTestsObserver(Varien_Event_Observer $observer)
+	 * @param $callback
+	 * @return mixed
+	**/
+	public function simulatedCallback($callback, array $params = array())
 	{
-		$observer->getEvent()
-			->getHelper()
-				->applyTest(array($this, 'checkForPluginInstallation'));
+		$coreHelper = Mage::helper('wp_addon_cpt/core');
+		$result = null;
 		
-		return $this;
-	}
-	
-	/**
-	 * Check whether the plugin is installed in WP
-	 * If not, try and install it
-	 *
-	 * @return $this
-	 */
-	public function checkForPluginInstallation()
-	{
-		if (!$this->_installPlugin()) {
-			throw Fishpig_Wordpress_Exception::warning(
-				'Custom Post Types',
-				sprintf('Unable to find the required Custom Post Types plugin installed in WordPress. Please <a href="%s" target="_blank">click here</a> for more information.', 'http://fishpig.co.uk/magento/wordpress-integration/post-types-taxonomies/installation/#plugin')
-			);	
-		}
-
-		if (!Mage::helper('wordpress')->getWpOption('fishpig_posttypes')) {
-			throw  Fishpig_Wordpress_Exception::warning(
-				'Custom Post Types',
-				'No custom post type data found. To generate the custom post data, login to your WordPress Admin and it will be generated automatically.'
-			);
-		}
-
-		return $this;
-	}
-	
-	/**
-	 * Install the plugin WordPress
-	 *
-	 * @return bool
-	 */
-	protected function _installPlugin()
-	{
-		return Mage::helper('wordpress/plugin')->install($this->_getPluginTarget(), $this->_getPluginSource(), true);
-	}
-	
-	/**
-	 * Get the target file for the plugin
-	 *
-	 * @return string|false
-	 */
-	protected function _getPluginTarget()
-	{
-		if ($path = Mage::helper('wordpress')->getWordpressPath()) {
-			return rtrim($path, DS) . DS . 'wp-content' . DS . 'plugins' . DS . 'fishpig' . DS . 'custom-post-types.php';;
+		if ($coreHelper->isActive()) {
+			try {
+				$coreHelper->startWordPressSimulation();
+				
+				$result = call_user_func_array($callback, $params);
+				
+				$coreHelper->endWordPressSimulation();
+			}
+			catch (\Exception $e) {
+				$coreHelper->endWordPressSimulation();
+				Mage::helper('wordpress')->log($e->getMessage());
+			}
 		}
 		
-		return false;
+		return $result;
 	}
 	
-	/**
-	 * Get the source file for the plugin
+	/*
 	 *
-	 * @return string
+	 *
+	 * @return
 	 */
-	protected function _getPluginSource()
+	protected function _getCache()
 	{
-		return Mage::getModuleDir('', 'Fishpig_Wordpress_Addon_CPT') . DS . 'custom-post-types.php';
+		return Mage::getSingleton('core/cache');
 	}
 }
