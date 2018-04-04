@@ -1,9 +1,9 @@
 <?php
 /**
  * @category Fishpig
- * @package Fishpig_Wordpress_Addon_CPT
- * @license http://fishpig.co.uk/license.txt
- * @author Ben Tideswell <help@fishpig.co.uk>
+ * @package  Fishpig_Wordpress_Addon_CPT
+ * @license  https://fishpig.co.uk/license.txt
+ * @author   Ben Tideswell <help@fishpig.co.uk>
  */
 	
 class Fishpig_Wordpress_Addon_CPT_Helper_License extends Mage_Core_Helper_Abstract

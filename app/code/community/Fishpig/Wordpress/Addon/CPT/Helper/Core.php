@@ -172,12 +172,21 @@ class Fishpig_Wordpress_Addon_CPT_Helper_Core extends Mage_Core_Helper_Abstract
 		}
 	}
 
+	/*
+	 * Get the HTML
+	 *
+	 * @return string|false
+	 */
 	public function getHtml()
 	{
 		return ($html = Mage::registry('wordpress_html'))
 			? $html: false;
 	}
-	
+
+	/*
+	 * Update an array
+	 *
+	 */
 	protected function _updateArray(&$a, $values)
 	{
 		$originals = array();
@@ -350,4 +359,32 @@ class Fishpig_Wordpress_Addon_CPT_Helper_Core extends Mage_Core_Helper_Abstract
 		
 		return $this;
 	}	
+
+	/*
+	 * Perform a callback during WordPress simulation mode
+	 *
+	 * @param $callback
+	 * @return mixed
+	 */
+	public function simulatedCallback($callback, array $params = array())
+	{
+		$result = null;
+		
+		if ($this->isActive()) {
+			try {
+				$this->startWordPressSimulation();
+				
+				$result = call_user_func_array($callback, $params);
+				
+				$this->endWordPressSimulation();
+			}
+			catch (Exception $e) {
+				$this->endWordPressSimulation();
+				
+				Mage::helper('wordpress')->log($e);
+			}
+		}
+		
+		return $result;
+	}
 }

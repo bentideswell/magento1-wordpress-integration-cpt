@@ -78,10 +78,9 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 				if ($postTypes = $this->_getPostTypeDataFromWordPress()) {
 					$this->_getCache()->save(json_encode($postTypes), $cacheKey);
 				}
-			}
-
-			if (!$postTypes) {
-				throw new Exception('Unable to get post types.');
+				else {
+					return $this;
+				}
 			}
 
 			foreach($postTypes as $type => $data) {
@@ -172,10 +171,9 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 				if ($taxonomies = $this->_getTaxonomyDataFromWordPress()) {
 					$this->_getCache()->save(json_encode($taxonomies), $cacheKey);
 				}
-			}
-
-			if (!$taxonomies) {
-				throw new Exception('Unable to get taxonomies.');
+				else {
+					return $this;
+				}
 			}
 
 			foreach($taxonomies as $taxonomy => $data) {
