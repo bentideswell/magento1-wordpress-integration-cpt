@@ -41,8 +41,10 @@ class Fishpig_Wordpress_Addon_CPT_Helper_Core extends Mage_Core_Helper_Abstract
 		}
 
 		if ((int)Mage::app()->getStore()->getId() === 0) {
-			return;
-		}		
+			if (strpos(Mage::app()->getRequest()->getControllerName(), 'wordpress') !== 0) {
+				return;
+			}
+		}	
 		
 		try {
 			if (($path = Mage::helper('wordpress')->getWordPressPath()) === false) {
@@ -130,7 +132,7 @@ class Fishpig_Wordpress_Addon_CPT_Helper_Core extends Mage_Core_Helper_Abstract
 					$this->__('Unable to find wp-load.php at %s', dirname($file))
 				);
 			}
-			
+
 			// Fix for Multisite set_prefix error
 			global $wpdb;
 
