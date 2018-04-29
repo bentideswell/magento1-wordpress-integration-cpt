@@ -348,6 +348,8 @@ class Fishpig_Wordpress_Addon_CPT_Helper_Core extends Mage_Core_Helper_Abstract
 	**/
 	protected function _handlePotentialMissingIncludes()
 	{
+		Mage::helper('log');
+
 		Zend_Log::ERR;
 		Zend_Log_Formatter_Simple::DEFAULT_FORMAT;
 
