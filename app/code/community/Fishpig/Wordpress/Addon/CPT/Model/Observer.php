@@ -289,33 +289,78 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 			
 			$searchTerm = $observer->getEvent()
 				->getParsedSearchTerm();
-				
-			foreach($postTypes as $alias => $postType) {
-				if ($alias === 'post') {
-					continue;
-				}
+			
+			$groupedTypes = array();
+			
+			if ($queryStringTypes = Mage::app()->getRequest()->getParam('post_type')) {
+				$queryStringTypes = explode(',', $queryStringTypes);
+			}
 
+			if (!$queryStringTypes) {
+				$queryStringTypes = false;
+			}
+			
+			foreach($postTypes as $alias => $postType) {
 				if ((int)$postType->getExcludeFromSearch() === 1) {
 					continue;
 				}
-
-				$listBlock = Mage::getSingleton('core/layout')->createBlock('wordpress/post_list')
-					->setTemplate('wordpress/post/list.phtml');
 				
-				$wrapperBlock = Mage::getSingleton('core/layout')->createBlock('wp_addon_cpt/view')
-					->setPostType($postType)
-					->setParsedSearchTerm($searchTerm)
-					->setChild('post_list', $listBlock);
+				if ($queryStringTypes && !in_array($alias, $queryStringTypes)) {
+					continue;
+				}
 				
-				if (($searchHtml = trim($wrapperBlock->getPostListHtml())) !== '') {
-					$tabs[] = array(
-						'alias' => $alias,
-						'html' => $searchHtml,
-						'title' => Mage::helper('wordpress')->__($postType->getPluralName() ? $postType->getPluralName() : $postType->getName()),
-					);
+				if ($observer->getEvent()->getBlock()->isGroupPostTypes()) {
+					$groupedTypes[] = $alias;
+				}
+				else {
+					$listBlock = Mage::getSingleton('core/layout')->createBlock('wordpress/post_list')
+						->setTemplate('wordpress/post/list.phtml');
+					
+					$wrapperBlock = Mage::getSingleton('core/layout')->createBlock('wp_addon_cpt/view')
+						->setPostType($postType)
+						->setParsedSearchTerm($searchTerm)
+						->setChild('post_list', $listBlock);
+					
+					// Fix for a few sites
+					ob_start();
+					$searchHtml = trim($wrapperBlock->getPostListHtml());
+					ob_get_clean();
+					
+					if ($searchHtml) {
+						$tabs[] = array(
+							'alias' => $alias,
+							'html' => $searchHtml,
+							'title' => Mage::helper('wordpress')->__($postType->getPluralName() ? $postType->getPluralName() : $postType->getName()),
+						);
+					}
 				}
 			}
+
+			if (count($groupedTypes) > 0) {
+				$postCollection = Mage::getResourceModel('wordpress/post_collection')
+					->addPostTypeFilter($groupedTypes)
+					->addIsViewableFilter()
+					->addOrder('post_date', 'desc')
+					->addSearchStringFilter($searchTerm, array('post_title' => 5, 'post_content' => 1));
+					
+				$listHtml = Mage::getSingleton('core/layout')->createBlock('wordpress/post_list')
+						->setTemplate('wordpress/post/list.phtml')
+						->setPostCollection($postCollection)
+						->toHtml();
+
+				if ($listHtml) {
+					$tabs[] = array(
+						'alias' => 'cpts',
+						'html' => $listHtml,
+						'title' => Mage::helper('wordpress')->__('Posts'),
+					);
 			
+					if (isset($tabs['blog'])) {
+						unset($tabs['blog']);
+					}
+				}
+			}
+
 			$observer->getEvent()
 				->getTransport()
 					->setTabs($tabs);
