@@ -321,12 +321,7 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 						->setParsedSearchTerm($searchTerm)
 						->setChild('post_list', $listBlock);
 					
-					// Fix for a few sites
-					ob_start();
-					$searchHtml = trim($wrapperBlock->getPostListHtml());
-					ob_get_clean();
-					
-					if ($searchHtml) {
+					if ($searchHtml = trim($wrapperBlock->getPostListHtml())) {
 						$tabs[] = array(
 							'alias' => $alias,
 							'html' => $searchHtml,
