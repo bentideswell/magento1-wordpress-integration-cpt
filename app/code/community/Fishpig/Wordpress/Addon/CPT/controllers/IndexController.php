@@ -50,8 +50,6 @@ class Fishpig_Wordpress_Addon_CPT_IndexController extends Fishpig_Wordpress_Cont
 		$this->_initLayout();
 		
 		$this->_title($type->getName());
-			
-		$this->addCrumb('cpt', array('label' => $type->getName()));
 		
 		if (($headBlock = $this->getLayout()->getBlock('head')) !== false) {
 			$headBlock->addItem('link_rel', 
@@ -61,5 +59,21 @@ class Fishpig_Wordpress_Addon_CPT_IndexController extends Fishpig_Wordpress_Cont
 		}
 		
 		$this->renderLayout();
+	}
+	
+	
+	/*
+	 * Get the breadcrumbs for the entity
+	 *
+	 * @param  array $objects
+	 * @return void
+	 */
+	protected function _getEntityCrumbs(array &$objects)
+	{
+		$type = $this->getEntityObject();
+		
+		$objects['post_type_' . $type->getPostType()] = array(
+			'link' => '', 'label' => $type->getName(),
+		);
 	}
 }

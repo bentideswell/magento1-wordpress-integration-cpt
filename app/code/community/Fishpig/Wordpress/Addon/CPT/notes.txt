@@ -2,6 +2,9 @@
 # Custom Post Types / WordPress Integration
 ##
 
+04/06/2018 - 2.2.0.8
+- Added fix for new breadcrumbs system.
+
 10/01/2018 - v2.2.0.0
 - Removed need for custom post type plugin in WordPress.
 
