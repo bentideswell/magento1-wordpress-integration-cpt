@@ -104,7 +104,7 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 	protected function _getPostTypeDataFromWordPress()
 	{
 		try {
-			return $this->simulatedCallback(function() {
+			return Mage::helper('wp_addon_cpt/core')->simulatedCallback(function() {
 				if (!defined('ABSPATH')) {
 					return false;
 				}
@@ -197,7 +197,7 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 	protected function _getTaxonomyDataFromWordPress()
 	{
 		try {
-			return $this->simulatedCallback(function() {
+			return Mage::helper('wp_addon_cpt/core')->simulatedCallback(function() {
 				if (!($customTaxonomies = get_taxonomies(array('_builtin' => false), 'objects'))) {
 					return false;
 				}
@@ -362,34 +362,6 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 		}
 
 		return $this;
-	}
-	
-	/**
-	 * Perform a callback during WordPress simulation mode
-	 *
-	 * @param $callback
-	 * @return mixed
-	**/
-	public function simulatedCallback($callback, array $params = array())
-	{
-		$coreHelper = Mage::helper('wp_addon_cpt/core');
-		$result = null;
-		
-		if ($coreHelper->isActive()) {
-			try {
-				$coreHelper->startWordPressSimulation();
-				
-				$result = call_user_func_array($callback, $params);
-				
-				$coreHelper->endWordPressSimulation();
-			}
-			catch (\Exception $e) {
-				$coreHelper->endWordPressSimulation();
-				Mage::helper('wordpress')->log($e->getMessage());
-			}
-		}
-		
-		return $result;
 	}
 	
 	/*
