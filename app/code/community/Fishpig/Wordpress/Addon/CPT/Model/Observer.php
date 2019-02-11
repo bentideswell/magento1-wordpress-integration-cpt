@@ -8,6 +8,11 @@
  
 class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 {
+	/*
+	 * @const bool
+	 */
+	const CAN_CACHE = true;
+	
 	/**
 	 * Determine whether the CPT plugin is enabled in WordPress
 	 *
@@ -70,7 +75,7 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 		try {
 			$cacheKey = 'posttype_' . Mage::app()->getStore()->getId();
 
-			if ($postTypes = $this->_getCache()->load($cacheKey)) {
+			if (self::CAN_CACHE && ($postTypes = $this->_getCache()->load($cacheKey))) {
 				$postTypes = json_decode($postTypes, true);
 			}
 			
@@ -163,7 +168,7 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 		try {
 			$cacheKey = 'taxonomy_' . Mage::app()->getStore()->getId();
 
-			if ($taxonomies = $this->_getCache()->load($cacheKey)) {
+			if (self::CAN_CACHE && ($taxonomies = $this->_getCache()->load($cacheKey))) {
 				$taxonomies = json_decode($taxonomies, true);
 			}
 
@@ -214,7 +219,7 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 					}
 		
 					$data = json_decode(json_encode($data), true);
-		
+
 					if ($blogPrefix && isset($data['rewrite']) && isset($data['rewrite']['slug'])) {
 						if (strpos($data['rewrite']['slug'], 'blog/') === 0) {
 							$data['rewrite']['slug'] = substr($data['rewrite']['slug'], strlen('blog/'));

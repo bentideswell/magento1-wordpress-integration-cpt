@@ -1,6 +1,8 @@
 ##
 # Custom Post Types / WordPress Integration
 ##
+11/02/2019 - 2.2.0.19
+- Added support for front
 
 04/06/2018 - 2.2.0.8
 - Added fix for new breadcrumbs system.
