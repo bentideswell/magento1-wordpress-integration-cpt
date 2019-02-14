@@ -75,13 +75,13 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 		try {
 			$cacheKey = 'posttype_' . Mage::app()->getStore()->getId();
 
-			if (self::CAN_CACHE && ($postTypes = $this->_getCache()->load($cacheKey))) {
+			if (self::CAN_CACHE && ($postTypes = Mage::app()->loadCache($cacheKey))) {
 				$postTypes = json_decode($postTypes, true);
 			}
 			
 			if (!$postTypes) {
 				if ($postTypes = $this->_getPostTypeDataFromWordPress()) {
-					$this->_getCache()->save(json_encode($postTypes), $cacheKey);
+					Mage::app()->saveCache(json_encode($postTypes), $cacheKey);
 				}
 				else {
 					return $this;
@@ -168,13 +168,13 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 		try {
 			$cacheKey = 'taxonomy_' . Mage::app()->getStore()->getId();
 
-			if (self::CAN_CACHE && ($taxonomies = $this->_getCache()->load($cacheKey))) {
+			if (self::CAN_CACHE && ($taxonomies = Mage::app()->loadCache($cacheKey))) {
 				$taxonomies = json_decode($taxonomies, true);
 			}
 
 			if (!$taxonomies) {
 				if ($taxonomies = $this->_getTaxonomyDataFromWordPress()) {
-					$this->_getCache()->save(json_encode($taxonomies), $cacheKey);
+					Mage::app()->saveCache(json_encode($taxonomies), $cacheKey);
 				}
 				else {
 					return $this;
@@ -367,15 +367,5 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 		}
 
 		return $this;
-	}
-	
-	/*
-	 *
-	 *
-	 * @return
-	 */
-	protected function _getCache()
-	{
-		return Mage::getSingleton('core/cache');
 	}
 }

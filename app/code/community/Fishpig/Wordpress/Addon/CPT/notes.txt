@@ -1,6 +1,9 @@
 ##
 # Custom Post Types / WordPress Integration
 ##
+14/02/2019 - 2.2.0.20
+- Fixed cache bug
+
 11/02/2019 - 2.2.0.19
 - Added support for front
 
