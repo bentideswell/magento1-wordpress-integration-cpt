@@ -76,7 +76,11 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 			$cacheKey = 'posttype_' . Mage::app()->getStore()->getId();
 
 			if (self::CAN_CACHE && ($postTypes = Mage::app()->loadCache($cacheKey))) {
-				$postTypes = json_decode($postTypes, true);
+				if (!($postTypes = json_decode($postTypes, true))) {
+  				// NO post types but cached so must be none set in WP
+  				// Flush cache to check again
+  				return $this;
+				}
 			}
 			
 			if (!$postTypes) {
@@ -84,6 +88,8 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 					Mage::app()->saveCache(json_encode($postTypes), $cacheKey);
 				}
 				else {
+  				// NO post types so cache an empty array to save lookup every request
+					Mage::app()->saveCache(json_encode(array()), $cacheKey);
 					return $this;
 				}
 			}
@@ -169,7 +175,10 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 			$cacheKey = 'taxonomy_' . Mage::app()->getStore()->getId();
 
 			if (self::CAN_CACHE && ($taxonomies = Mage::app()->loadCache($cacheKey))) {
-				$taxonomies = json_decode($taxonomies, true);
+				if (!($taxonomies = json_decode($taxonomies, true))) {
+  				// No taxonomies but it was cached so return
+  				return $this;
+				}
 			}
 
 			if (!$taxonomies) {
@@ -177,6 +186,9 @@ class Fishpig_Wordpress_Addon_CPT_Model_Observer extends Varien_Object
 					Mage::app()->saveCache(json_encode($taxonomies), $cacheKey);
 				}
 				else {
+  				// We want to cache an empty array so we don't try to load taxonomies on every request
+					Mage::app()->saveCache(json_encode(array()), $cacheKey);
+					
 					return $this;
 				}
 			}

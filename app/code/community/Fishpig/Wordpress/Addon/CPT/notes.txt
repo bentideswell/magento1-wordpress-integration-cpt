@@ -1,6 +1,9 @@
 ##
 # Custom Post Types / WordPress Integration
 ##
+03/09/2019 - 2.2.0.29
+- Improved caching so if no types or taxonomies are set, look up doesn't happen every request
+
 14/02/2019 - 2.2.0.20
 - Fixed cache bug
 
